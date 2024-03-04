@@ -1,4 +1,6 @@
-import cmd, time
+import cmd
+import time
+
 
 class MyCmd(cmd.Cmd):
     prompt = '>> '
@@ -16,6 +18,7 @@ class MyCmd(cmd.Cmd):
         print("Quitting...")
         time.sleep(2)
         return True
+
 
 if __name__ == '__main__':
     MyCmd().cmdloop()
