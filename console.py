@@ -3,14 +3,32 @@
 import cmd
 import json
 import shlex
-from models.base_model import BaseModel
+import models
 from models import storage
+from models.base_model import BaseModel
+from models.amenity import Amenity
+from models.city import City
+from models.place import Place
+from models.review import Review
+from models.state import State
+from models.user import User
 
 
 class HBNBCommand(cmd.Cmd):
     """HBNBCommand Class"""
 
     prompt = '(hbnb) '
+
+    all_classes = {
+        'BaseModel': BaseModel,
+        'Amenity': Amenity,
+        'State': State,
+        'Place': Place,
+        'Review': Review,
+        'User': User,
+        'City': City
+        }
+
 
     def do_quit(self, arg):
         """Quit command to exit the program\n"""
@@ -30,7 +48,7 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
 
-        class_name = arg.split()[0]
+        class_name = shlex.split(arg)[0]
 
         try:
             class_instance = globals()[class_name]()
@@ -44,30 +62,28 @@ class HBNBCommand(cmd.Cmd):
         Prints the string representation of an instance
         based on the class name and id.
         """
-        args = arg.split()
-        objdict = storage.all()
+        args = shlex.split(arg)
+        obj_dict = storage.all()
         if len(args) == 0:
             print("** class name missing **")
-        elif args[0] not in globals() or \
-                not issubclass(globals()[args[0]], BaseModel):
+        elif args[0] not in HBNBCommand.all_classes:
             print("** class doesn't exist **")
         elif len(args) == 1:
             print("** instance id missing **")
-        elif "{}.{}".format(args[0], args[1]) not in objdict:
+        elif "{}.{}".format(args[0], args[1]) not in obj_dict:
             print("** no instance found **")
         else:
-            print(objdict["{}.{}".format(args[0], args[1])])
+            print(obj_dict["{}.{}".format(args[0], args[1])])
 
     def do_destroy(self, arg):
         """
         Deletes an instance based on the class name
         and id (save the change into the JSON file)
         """
-        args = arg.split()
+        args = shlex.split(arg)
         if arg == '':
             print('** class name missing **')
-        elif args[0] not in globals() or \
-                not issubclass(globals()[args[0]], BaseModel):
+        elif args[0] not in HBNBCommand.all_classes:
             print('** class doesn\'t exist **')
         else:
             if len(args) < 2:
@@ -87,11 +103,10 @@ class HBNBCommand(cmd.Cmd):
         Prints all string representation of all instances
         based or not on the class name. Ex: $ all BaseModel or $ all
         """
-        args = arg.split()
+        args = shlex.split(arg)
         result = []
         if len(args) != 0:
-            if args[0] not in globals() or \
-                    not issubclass(globals()[args[0]], BaseModel):
+            if args[0] not in HBNBCommand.all_classes:
                 print('** class doesn\'t exist **')
                 return
             else:
@@ -104,84 +119,32 @@ class HBNBCommand(cmd.Cmd):
         print(result)
 
     def do_update(self, arg):
-        ''' Updates an instance based on the class name & id adding/updating
-            attribute (save the change into the JSON file). Ex: $ update
-            BaseModel 1234-1234-1234 email "aibnb@holbertonschool.com". '''
-
-        if not arg:
-            print("** class name missing **")
-            return
+        'Updates an instance based on the class name and id'
         args = shlex.split(arg)
-        storage.reload()
-        obj = storage.all()
-
-        if args[0] not in globals() or \
-                not issubclass(globals()[args[0]], BaseModel):
+        objects = models.storage.all()
+        if not args:
+            print("** class name missing **")
+            return 0
+        elif args[0] not in HBNBCommand.all_classes:
             print("** class doesn't exist **")
-            return
-        if len(args) == 1:
+            return 0
+        elif len(args) < 2:
             print("** instance id missing **")
-            return
-        try:
-            obj_key = args[0] + "." + args[1]
-            obj[obj_key]
-        except KeyError:
-            print("** no instance found **")
-            return
-        if (len(args) == 2):
+            return 0
+        elif len(args) < 3:
             print("** attribute name missing **")
-            return
-        if (len(args) == 3):
+            return 0
+        elif len(args) < 4:
             print("** value missing **")
-            return
-        obj_dict = obj[obj_key].__dict__
-        if args[2] in obj_dict.keys():
-            d_type = type(obj_dict[args[2]])
-            print(d_type)
-            obj_dict[args[2]] = type(obj_dict[args[2]])(args[3])
-        else:
-            obj_dict[args[2]] = args[3]
-        storage.save()
+            return 0
 
-    def do_update2(self, arg):
-        ''' Updates an instance based on the class name & id adding/updating
-            attribute (save the change into the JSON file). Ex: $ update
-            BaseModel 1234-1234-1234 email "aibnb@holbertonschool.com". '''
-
-        if not arg:
-            print("** class name missing **")
-            return
-        my_dict = "{" + arg.split("{")[1]
-        args = shlex.split(arg)
-        storage.reload()
-        obj = storage.all()
-
-        if args[0] not in globals() or \
-                not issubclass(globals()[args[0]], BaseModel):
-            print("** class doesn't exist **")
-            return
-        if len(args) == 1:
-            print("** instance id missing **")
-            return
+        key = "{}.{}".format(args[0], args[1])
         try:
-            obj_key = args[0] + "." + args[1]
-            obj[obj_key]
-        except KeyError:
+            objects[key].__dict__[args[2]] = args[3]
+            models.storage.save()
+        except Exception:
             print("** no instance found **")
-            return
-        if (my_dict == "{"):
-            print("** attribute name missing **")
-            return
-        my_dict = my_dict.replace("\'", "\"")
-        my_dict = json.loads(my_dict)
-        obj_inst = obj[obj_key]
-        for k in my_dict:
-            if hasattr(obj_inst, k):
-                d_type = type(getattr(obj_inst, k))
-                setattr(obj_inst, k, my_dict[k])
-            else:
-                setattr(obj_inst, k, my_dict[k])
-        storage.save()
+            return 0
 
 
 if __name__ == '__main__':

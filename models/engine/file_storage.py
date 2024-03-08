@@ -6,7 +6,6 @@ Defines a `FileStorage` class.
 """
 import os
 import json
-from models.base_model import BaseModel
 
 
 class FileStorage():
@@ -35,21 +34,35 @@ class FileStorage():
         """
         serializes __objects to the JSON file (path: __file_path)
         """
-        serialized_objs = {key: obj.to_dict() for key, obj in self.__objects.items()}
+        serialized_objs = {key: obj.to_dict() 
+                           for key, obj in self.__objects.items()}
         with open(self.__file_path, "w") as f:
             json.dump(serialized_objs, f)
 
     def reload(self):
-        """
-        deserializes the JSON file to __objects only if the JSON
-        file exists; otherwise, does nothing
-        """
-        if os.path.exists(self.__file_path):
-            try:
-                with open(self.__file_path, 'r') as f:
-                    dict = json.loads(f.read())
-                    for value in dict.values():
-                        cls = value["__class__"]
-                        self.new(eval(cls)(**value))
-            except Exception:
-                pass
+        ''' deserializes/loads the JSON file to __objects '''
+
+        from models.base_model import BaseModel
+        from models.user import User
+        from models.state import State
+        from models.city import City
+        from models.amenity import Amenity
+        from models.place import Place
+        from models.review import Review
+        my_dict = {
+            "BaseModel": BaseModel,
+            "User": User,
+            "State": State,
+            "City": City,
+            "Amenity": Amenity,
+            "Place": Place,
+            "Review": Review
+            }
+        if not os.path.isfile(self.__file_path):
+            return
+        with open(self.__file_path, "r") as file_path:
+            objects = json.load(file_path)
+            self.__objects = {}
+            for key in objects:
+                name = key.split(".")[0]
+                self.__objects[key] = my_dict[name](**objects[key])
