@@ -29,6 +29,11 @@ class HBNBCommand(cmd.Cmd):
         'City': City
         }
 
+    def do_help(self, arg):
+        """To get help on a command, type help <topic>.
+        """
+        return super().do_help(arg)
+
     def do_quit(self, arg):
         """Quit command to exit the program\n"""
         return True
@@ -37,6 +42,11 @@ class HBNBCommand(cmd.Cmd):
         """EOF command to exit the program\n"""
         print()
         return True
+
+    def emptyline(self):
+        """Override default `empty line + return` behaviour.
+        """
+        pass
 
     def do_create(self, arg):
         """
