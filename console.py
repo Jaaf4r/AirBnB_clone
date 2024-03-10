@@ -112,6 +112,12 @@ class HBNBCommand(cmd.Cmd):
         Prints all string representation of all instances
         based or not on the class name. Ex: $ all BaseModel or $ all
         """
+        print(self.funcAll(arg))
+
+    def funcAll(self, arg):
+        """
+        method that returns the string representation of all instances
+        """
         args = shlex.split(arg)
         result = []
         if len(args) != 0:
@@ -125,7 +131,23 @@ class HBNBCommand(cmd.Cmd):
         else:
             for key, value in storage.all().items():
                 result.append(value.__str__())
-        print(result)
+        return result
+
+    def default(self, line):
+        """
+        default input
+        """
+        twoPart = line.split('.')
+        if len(twoPart) == 2 and twoPart[1] == 'all()':
+            ls = self.funcAll(twoPart[0])
+            num = 0
+            print('[', end='')
+            for i in ls:
+                if num:
+                    print(', ', end='')
+                print("{}".format(i), end='')
+                num = 1
+            print(']')
 
     def do_update(self, arg):
         'Updates an instance based on the class name and id'

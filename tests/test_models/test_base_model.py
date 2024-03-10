@@ -2,10 +2,12 @@ import unittest
 from datetime import datetime
 from models.base_model import BaseModel
 
+
 class TestBaseModel(unittest.TestCase):
 
     def test_attributes(self):
-        # Test that id, created_at, and updated_at are initialized properly
+        # Test that id, created_at, and updated_at
+        # are initialized properly
         model = BaseModel()
         self.assertTrue(hasattr(model, 'id'))
         self.assertTrue(hasattr(model, 'created_at'))
@@ -48,6 +50,7 @@ class TestBaseModel(unittest.TestCase):
         self.assertEqual(model.id, '123')
         self.assertEqual(model.created_at.isoformat(), '2024-03-09T12:00:00')
         self.assertEqual(model.updated_at.isoformat(), '2024-03-09T12:00:00')
+
 
 if __name__ == '__main__':
     unittest.main()

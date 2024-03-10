@@ -3,8 +3,9 @@ from unittest.mock import patch
 from io import StringIO
 from console import HBNBCommand
 
+
 class TestHBNBCommand(unittest.TestCase):
-    
+
     def setUp(self):
         self.cmd = HBNBCommand()
 
@@ -54,6 +55,7 @@ class TestHBNBCommand(unittest.TestCase):
     def test_eof(self):
         with patch('sys.stdout', new=StringIO()) as fake_out:
             self.assertTrue(self.cmd.onecmd("EOF"))
+
 
 if __name__ == '__main__':
     unittest.main()
