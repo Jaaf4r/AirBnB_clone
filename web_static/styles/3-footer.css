@@ -3,14 +3,7 @@ footer {
     height: 60px;
     width: 100%;
     border-top: 1px solid #CCCCCC;
-    /*f task lekhra had position khasso ykon 
-    relative bash i7tarem douk height w dak
-    tkhrbi9 dial div wlkn f task lakhrin ila
-    dertih relative ghaytle3 lfou9 7it howa tma
-    fin lbody kissali, mhm lmokhtasser lmofid hh
-    howa absolute khdam mezian wlkn f task lekhra kitle3 lfog w howa khasso yb9a lte7t
-    */
-    position: absolute;
+    margin-top: auto;
     bottom: 0;
     left: 0;
 }

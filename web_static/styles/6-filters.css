@@ -95,6 +95,7 @@ section.filters .amenities ul p {
 section.filters .locations:hover ul,
 section.filters .amenities:hover ul {
 	display: block;
+	z-index: 1;
 }
 
 section.filters .locations ul h2:not(:first-of-type) {
